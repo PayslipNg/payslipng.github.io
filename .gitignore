@@ -1,0 +1,4 @@
+tools/
+*.key
+.env
+node_modules/

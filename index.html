@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en-NG">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PayslipNG — Free 2026 Nigeria Payroll, PAYE & Payslip Generator (Nigeria Tax Act 2025)</title>
+<meta name="description" content="Run payroll for your Nigerian small business in your browser. 2026 PAYE bands under the Nigeria Tax Act 2025, rent relief, pension, NHF, printable payslips, monthly remittance schedule and the 31 January annual return worksheet. No sign-up. Data never leaves your device.">
+<meta name="keywords" content="Nigeria payroll, PAYE calculator 2026, Nigeria Tax Act 2025, payslip generator Nigeria, rent relief, pension, NHF, annual PAYE return 31 January">
+<meta property="og:title" content="PayslipNG — 2026 Nigeria payroll & payslips, offline">
+<meta property="og:description" content="New 2026 PAYE bands, rent relief, pension & NHF. Payslips, remittance schedule and annual return worksheet. Free for up to 3 staff.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0b6b3a">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b6b3a'/%3E%3Ctext x='16' y='22' font-size='16' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'%3E%E2%82%A6%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+<header class="top no-print">
+  <div class="wrap row">
+    <a class="brand" href="#">₦ PayslipNG</a>
+    <nav><a href="#app">Open app</a><a href="#how">How it's calculated</a><a href="#pricing">Pricing</a></nav>
+  </div>
+</header>
+
+<section class="hero no-print">
+  <div class="wrap">
+    <p class="pill">Updated for the Nigeria Tax Act 2025 · in force 1 Jan 2026</p>
+    <h1>2026 payroll and payslips for Nigerian small businesses, in your browser</h1>
+    <p class="lead">Add your staff once. PayslipNG works out PAYE with the new 2026 bands and rent relief, plus pension, NHF and NHIS. You get printable payslips, a monthly remittance schedule and the per-employee worksheet for the <strong>31 January</strong> employer annual return.</p>
+    <div class="cta"><a class="btn primary" href="#app">Start free, no sign-up</a><a class="btn" href="#how">See the tax rules</a></div>
+    <ul class="ticks">
+      <li>Free for up to 3 employees</li><li>Works offline on your phone</li><li>Your data stays on your device</li><li>One-time Pro licence, no monthly fee</li>
+    </ul>
+  </div>
+</section>
+
+<main id="app" class="wrap">
+  <div id="limitBanner" class="banner hidden no-print"></div>
+  <div class="tabs no-print" role="tablist">
+    <button data-tab="employer" class="active">1. Employer</button>
+    <button data-tab="staff">2. Staff</button>
+    <button data-tab="payslips">3. Payslips</button>
+    <button data-tab="remit">4. Remittance</button>
+    <button data-tab="annual">5. Annual return</button>
+    <button data-tab="data">Data &amp; Pro</button>
+  </div>
+
+  <section id="tab-employer" class="tab card no-print">
+    <h2>Employer details</h2>
+    <form id="employerForm" class="grid">
+      <label>Business name<input name="name" required maxlength="120"></label>
+      <label>Address<input name="address" maxlength="200"></label>
+      <label>Employer TIN<input name="tin" maxlength="40"></label>
+      <label>Pension employer code<input name="penCode" maxlength="40"></label>
+      <label>Pay period (month)<input name="period" type="month" required></label>
+      <label>Payment date<input name="payDate" type="date"></label>
+      <fieldset class="full"><legend>Rates (editable)</legend>
+        <div class="grid four">
+          <label>Employee pension %<input name="pensionEe" type="number" step="0.01" min="0" max="100"></label>
+          <label>Employer pension %<input name="pensionEr" type="number" step="0.01" min="0" max="100"></label>
+          <label>NHF % of basic<input name="nhfRate" type="number" step="0.01" min="0" max="100"></label>
+          <label>NHIS employee % of basic<input name="nhisRate" type="number" step="0.01" min="0" max="100"></label>
+        </div>
+      </fieldset>
+      <div class="full"><button class="btn primary" type="submit">Save employer</button> <span class="saved" id="empSaved"></span></div>
+    </form>
+  </section>
+
+  <section id="tab-staff" class="tab card hidden no-print">
+    <h2>Staff <small id="staffCount"></small></h2>
+    <div id="staffList"></div>
+    <details id="staffDetails" open>
+      <summary id="staffFormTitle">Add employee</summary>
+      <form id="staffForm" class="grid">
+        <input type="hidden" name="id">
+        <label>Full name<input name="name" required maxlength="120"></label>
+        <label>Staff ID<input name="staffId" maxlength="40"></label>
+        <label>Job title<input name="title" maxlength="80"></label>
+        <label>State of residence (for PAYE)<input name="state" maxlength="40" list="states"></label>
+        <label>Tax ID / TIN<input name="tin" maxlength="40"></label>
+        <label>PFA<input name="pfa" maxlength="80"></label>
+        <label>RSA PIN<input name="rsa" maxlength="40"></label>
+        <label>Bank &amp; account<input name="bank" maxlength="80"></label>
+        <fieldset class="full"><legend>Monthly pay (₦)</legend><div class="grid four">
+          <label>Basic<input name="basic" type="number" min="0" step="0.01" required></label>
+          <label>Housing<input name="housing" type="number" min="0" step="0.01"></label>
+          <label>Transport<input name="transport" type="number" min="0" step="0.01"></label>
+          <label>Other allowances<input name="other" type="number" min="0" step="0.01"></label>
+        </div></fieldset>
+        <fieldset class="full"><legend>Deductions &amp; reliefs</legend><div class="grid four">
+          <label class="chk"><input name="pension" type="checkbox" checked> Pension (PRA 2014)</label>
+          <label class="chk"><input name="nhf" type="checkbox"> NHF</label>
+          <label class="chk"><input name="nhis" type="checkbox"> NHIS</label>
+          <label>Annual rent paid (₦)<input name="rent" type="number" min="0" step="0.01"></label>
+          <label>Annual life insurance premium (₦)<input name="lifePremium" type="number" min="0" step="0.01"></label>
+          <label>Annual owner-occupied mortgage interest (₦)<input name="mortgageInterest" type="number" min="0" step="0.01"></label>
+          <label>Other monthly deduction, after tax (₦)<input name="otherDeduction" type="number" min="0" step="0.01"></label>
+          <label>Months worked in 2026<input name="months" type="number" min="0" max="12" step="1" value="12"></label>
+        </div></fieldset>
+        <div class="full"><button class="btn primary" type="submit" id="staffSubmit">Add employee</button> <button class="btn" type="reset" id="staffReset">Clear</button></div>
+      </form>
+    </details>
+    <datalist id="states"></datalist>
+  </section>
+
+  <section id="tab-payslips" class="tab hidden">
+    <div class="card no-print row between"><h2>Payslips <small id="periodLabel"></small></h2><div><button class="btn primary" data-print="payslips">Print / save PDF</button> <button class="btn" data-csv="payroll">Payroll CSV</button></div></div>
+    <div id="payslips" class="printable"></div>
+  </section>
+
+  <section id="tab-remit" class="tab hidden">
+    <div class="card no-print row between"><h2>Monthly remittance schedule</h2><div><button class="btn primary" data-print="remit">Print / save PDF</button> <button class="btn" data-csv="remit">CSV</button></div></div>
+    <div id="remit" class="card printable"></div>
+  </section>
+
+  <section id="tab-annual" class="tab hidden">
+    <div class="card no-print row between"><h2>Annual worksheet (2026 year, due 31 Jan 2027)</h2><div><button class="btn primary" data-print="annual">Print / save PDF</button> <button class="btn" data-csv="annual">CSV</button></div></div>
+    <div id="annual" class="card printable"></div>
+  </section>
+
+  <section id="tab-data" class="tab card hidden no-print">
+    <h2>Backup</h2>
+    <p>Everything is saved in this browser only. Download a backup file regularly, and use it to move to another device.</p>
+    <p><button class="btn primary" id="exportBtn">Download backup (.json)</button>
+      <label class="btn">Restore backup<input type="file" id="importFile" accept="application/json,.json" hidden></label>
+      <button class="btn danger" id="wipeBtn">Delete all data on this device</button></p>
+    <h2 id="pricing">Pro licence</h2>
+    <div class="grid two">
+      <div class="plan"><h3>Free</h3><p class="price">₦0</p><ul><li>Up to 3 employees</li><li>Payslips, remittance schedule, annual worksheet</li><li>CSV export and backups</li></ul></div>
+      <div class="plan pro"><h3>Pro</h3><p class="price">One-time licence</p><ul><li>Unlimited employees</li><li>All free features</li><li>Free updates to the 2026 rules</li></ul>
+        <!-- BUY LINK PLACEHOLDER: replace href="#" with the Selar or Paystack product link once the owner creates it. -->
+        <a class="btn primary" id="buyLink" href="#" data-placeholder="true">Buy Pro (link coming soon)</a></div>
+    </div>
+    <form id="licenceForm" class="row"><input name="key" placeholder="PSNG-XXXX-XXXX-XXXX" maxlength="24" aria-label="Licence key"><button class="btn primary" type="submit">Activate</button></form>
+    <p id="licenceStatus"></p>
+    <p class="muted small">The licence is checked offline in your browser. It is an honour system, not copy protection.</p>
+  </section>
+</main>
+
+<section id="how" class="wrap card no-print">
+  <h2>How it's calculated</h2>
+  <ol>
+    <li><strong>Gross pay</strong> = basic + housing + transport + other allowances. Annual gross = monthly gross × 12.</li>
+    <li><strong>Eligible deductions</strong> (Nigeria Tax Act 2025, section 30(2)): employee pension under the Pension Reform Act (default 8% of basic + housing + transport), NHF (default 2.5% of basic), NHIS contributions, owner-occupied mortgage interest, life insurance premiums, and <strong>rent relief of 20% of annual rent paid, capped at ₦500,000</strong>. The old Consolidated Relief Allowance no longer applies.</li>
+    <li><strong>Chargeable income</strong> = annual gross − eligible deductions.</li>
+    <li><strong>Annual tax</strong> (Fourth Schedule): first ₦800,000 at 0%; next ₦2,200,000 at 15%; next ₦9,000,000 at 18%; next ₦13,000,000 at 21%; next ₦25,000,000 at 23%; above ₦50,000,000 at 25%.</li>
+    <li><strong>Monthly PAYE</strong> = annual tax ÷ 12. Remit by the 10th of the following month to the tax authority of the employee's state of residence.</li>
+    <li>Employer pension (default 10%) is a cost to the employer and is not deducted from the employee.</li>
+  </ol>
+  <p class="small">Sources: Nigeria Tax Act 2025 (Act No. 7, Official Gazette No. 117, 26 June 2025), section 30 and Fourth Schedule; PwC Worldwide Tax Summaries, "Nigeria – Individual – Sample personal income tax calculation" (reviewed 29 May 2026), which our test suite reproduces exactly (₦25m gross, ₦2m rent → PAYE ₦4,176,000); Joint Tax Board 2026 Personal Income Tax Guidelines for remittance and filing dates.</p>
+  <p class="disclaimer"><strong>Not tax advice.</strong> PayslipNG is an informational tool. Check figures with your tax adviser or state tax authority before you remit or file. Tax authorities may require documents for every relief claimed.</p>
+  <p class="small"><strong>Privacy:</strong> PayslipNG has no server, no account and no analytics. Your data is stored only in this browser (localStorage) and never leaves your device unless you download a file.</p>
+</section>
+<footer class="wrap muted small no-print">© 2026 PayslipNG · Not affiliated with NRS, JTB, PenCom or any state IRS.</footer>
+<script src="tax.js"></script>
+<script src="licence.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
