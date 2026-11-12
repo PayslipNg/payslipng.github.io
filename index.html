@@ -1,15 +1,15 @@
 <!doctype html>
-<html lang="en-NG">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PayslipNG — Free 2026 Nigeria Payroll, PAYE & Payslip Generator (Nigeria Tax Act 2025)</title>
-<meta name="description" content="Run payroll for your Nigerian small business in your browser. 2026 PAYE bands under the Nigeria Tax Act 2025, rent relief, pension, NHF, printable payslips, monthly remittance schedule and the 31 January annual return worksheet. No sign-up. Data never leaves your device.">
+<title>PayslipNG — Free Payroll, Income Tax & Payslip Generator (Nigeria 2026 + any country)</title>
+<meta name="description" content="Run payroll for your small business in your browser, for Nigeria (2026 PAYE under the Nigeria Tax Act 2025) or any country with your own tax bands, currency and deductions. 2026 PAYE bands under the Nigeria Tax Act 2025, rent relief, pension, NHF, printable payslips, monthly remittance schedule and the 31 January annual return worksheet. No sign-up. Data never leaves your device.">
 <link rel="canonical" href="https://payslipng.github.io/">
 <meta property="og:url" content="https://payslipng.github.io/">
-<meta name="keywords" content="Nigeria payroll, PAYE calculator 2026, Nigeria Tax Act 2025, payslip generator Nigeria, rent relief, pension, NHF, annual PAYE return 31 January">
-<meta property="og:title" content="PayslipNG — 2026 Nigeria payroll & payslips, offline">
-<meta property="og:description" content="New 2026 PAYE bands, rent relief, pension & NHF. Payslips, remittance schedule and annual return worksheet. Free for up to 3 staff.">
+<meta name="keywords" content="payroll generator, payslip generator, custom tax bands, payroll any country, Nigeria payroll, PAYE calculator 2026, Nigeria Tax Act 2025, payslip generator Nigeria, rent relief, pension, NHF, annual PAYE return 31 January">
+<meta property="og:title" content="PayslipNG — payroll & payslips for Nigeria or any country, offline">
+<meta property="og:description" content="Use custom tax bands and currency anywhere, or the new 2026 Nigeria PAYE bands, rent relief, pension & NHF. Payslips, remittance schedule and annual return worksheet. Free for up to 3 staff.">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#0b6b3a">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'">
@@ -26,8 +26,8 @@
 
 <section class="hero no-print">
   <div class="wrap">
-    <p class="pill">Updated for the Nigeria Tax Act 2025 · in force 1 Jan 2026</p>
-    <h1>2026 payroll and payslips for Nigerian small businesses, in your browser</h1>
+    <p class="pill">Nigeria Tax Act 2025 built in · or set your own bands, currency and deductions for any country</p>
+    <h1>Payroll and payslips for small businesses, in your browser. Built for Nigeria, works anywhere</h1>
     <p class="lead">Add your staff once. PayslipNG works out PAYE with the new 2026 bands and rent relief, plus pension, NHF and NHIS. You get printable payslips, a monthly remittance schedule and the per-employee worksheet for the <strong>31 January</strong> employer annual return.</p>
     <div class="cta"><a class="btn primary" href="#app">Start free, no sign-up</a><a class="btn" href="#how">See the tax rules</a></div>
     <ul class="ticks">
@@ -56,6 +56,15 @@
       <label>Pension employer code<input name="penCode" maxlength="40"></label>
       <label>Pay period (month)<input name="period" type="month" required></label>
       <label>Payment date<input name="payDate" type="date"></label>
+      <fieldset class="full"><legend>Country / tax mode</legend>
+        <div class="grid">
+          <label>Mode<select name="mode"><option value="ng">Nigeria (Nigeria Tax Act 2025 bands, rent relief)</option><option value="generic">Any country (custom bands)</option></select></label>
+          <label>Currency symbol or code (custom mode)<input name="currency" maxlength="6" placeholder="$, £, KES, GHS"></label>
+          <label>Annual tax-free allowance (custom mode)<input name="allowance" type="number" step="0.01" min="0" placeholder="0"></label>
+          <label class="full">Tax bands (custom mode): one per line as <code>band width, rate %</code>; leave the width empty on the last line for "everything above"<textarea name="bands" rows="5" placeholder="12570, 0&#10;37700, 20&#10;87430, 40&#10;, 45"></textarea></label>
+        </div>
+        <p class="small muted">Custom mode: income tax uses your bands and allowance on gross minus the deductions below (rent relief is Nigeria-only). The deduction rates below are generic: "pension" = employee/employer retirement or social contribution, "NHF"/"NHIS" = other % of basic. Always confirm with local rules.</p>
+      </fieldset>
       <fieldset class="full"><legend>Rates (editable)</legend>
         <div class="grid four">
           <label>Employee pension %<input name="pensionEe" type="number" step="0.01" min="0" max="100"></label>

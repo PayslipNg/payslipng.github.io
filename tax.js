@@ -12,12 +12,13 @@
   function r2(x) { return Math.round((x + Number.EPSILON) * 100) / 100; }
   function num(x) { x = Number(x); return isFinite(x) && x > 0 ? x : 0; }
 
-  function annualTax(chargeable) {
+  function annualTax(chargeable, bands) {
+    var B = bands || BANDS;
     var left = Math.max(0, num(chargeable)), tax = 0, lines = [];
-    for (var i = 0; i < BANDS.length; i++) {
-      var amt = Math.min(left, BANDS[i][0]);
-      var t = amt * BANDS[i][1];
-      lines.push({ band: BANDS[i][0], rate: BANDS[i][1], amount: r2(amt), tax: r2(t) });
+    for (var i = 0; i < B.length; i++) {
+      var amt = Math.min(left, B[i][0]);
+      var t = amt * B[i][1];
+      lines.push({ band: B[i][0], rate: B[i][1], amount: r2(amt), tax: r2(t) });
       tax += t; left -= amt;
       if (left <= 0) break;
     }
@@ -25,6 +26,7 @@
   }
   function rentRelief(annualRent) { return r2(Math.min(num(annualRent) * RENT_RELIEF_RATE, RENT_RELIEF_CAP)); }
 
+  /* Generic mode: cfg.mode='generic', cfg.bands=[[width,rate],...] (last width Infinity), cfg.allowance = annual tax-free allowance/personal deduction; rent relief is not applied. */
   var DEFAULTS = { pensionEe: 8, pensionEr: 10, nhfRate: 2.5, nhisRate: 5 };
 
   /* emp: monthly basic, housing, transport, other; flags pension(bool), nhf(bool), nhis(bool);
@@ -41,11 +43,12 @@
     var nhf = emp.nhf ? basic * num(cfg.nhfRate) / 100 : 0;
     var nhis = emp.nhis ? basic * num(cfg.nhisRate) / 100 : 0;
     var annualGross = gross * 12;
-    var rr = rentRelief(emp.rent);
+    var gen = cfg.mode === 'generic', rr = gen ? 0 : rentRelief(emp.rent);
     var life = num(emp.lifePremium), mort = num(emp.mortgageInterest);
     var annualDeductions = (eePension + nhf + nhis) * 12 + rr + life + mort;
-    var chargeable = Math.max(0, annualGross - annualDeductions);
-    var at = annualTax(chargeable);
+    var allow = gen ? num(cfg.allowance) : 0;
+    var chargeable = Math.max(0, annualGross - annualDeductions - allow);
+    var at = annualTax(chargeable, gen ? cfg.bands : null);
     var paye = r2(at.tax / 12);
     var otherDed = num(emp.otherDeduction);
     var net = gross - eePension - nhf - nhis - paye - otherDed;
@@ -67,8 +70,9 @@
     var m = computeMonthly(emp, cfg);
     var gross = m.gross * months, pen = m.eePension * months, nhf = m.nhf * months, nhis = m.nhis * months;
     var ded = pen + nhf + nhis + m.annual.rentRelief + m.annual.lifePremium + m.annual.mortgageInterest;
-    var chargeable = Math.max(0, gross - ded);
-    var at = annualTax(chargeable);
+    var gen = cfg && cfg.mode === 'generic', allow = gen ? num(cfg.allowance) * months / 12 : 0;
+    var chargeable = Math.max(0, gross - ded - allow);
+    var at = annualTax(chargeable, gen ? cfg.bands : null);
     var deducted = r2(m.paye * months);
     return { months: months, gross: r2(gross), pension: r2(pen), erPension: r2(m.erPension * months), nhf: r2(nhf), nhis: r2(nhis),
       rentRelief: m.annual.rentRelief, lifePremium: m.annual.lifePremium, mortgageInterest: m.annual.mortgageInterest,

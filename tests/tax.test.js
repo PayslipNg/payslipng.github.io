@@ -79,3 +79,14 @@ t('licence keys', () => {
   const k = L.make(); assert.ok(L.isValid(k.toLowerCase().replace(/-/g, ' ')));
 });
 console.log(`\n${pass} test groups passed`);
+
+t('generic mode: custom bands, allowance, no rent relief', () => {
+  const cfg = { mode: 'generic', allowance: 12000, bands: [[10000, 0.1], [Infinity, 0.2]], pensionEe: 0, pensionEr: 0 };
+  const m = T.computeMonthly({ basic: 5000, pension: false, rent: 999999 }, cfg); // gross 60000/yr
+  assert.strictEqual(m.annual.rentRelief, 0);
+  assert.strictEqual(m.annual.chargeable, 48000);
+  assert.strictEqual(m.annual.tax, 1000 + 7600); // 10000*.1 + 38000*.2
+  assert.strictEqual(m.paye, 716.67);
+  const a = T.computeAnnual({ basic: 5000, pension: false }, cfg, 12);
+  assert.strictEqual(a.taxLiability, 8600);
+});

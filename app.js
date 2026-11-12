@@ -6,12 +6,13 @@
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
-  function fmt(n) { return '₦' + Number(n || 0).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  var CUR = '₦';
+  function fmt(n) { return CUR + Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
   function plain(n) { return Number(n || 0).toFixed(2); }
   function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
   function thisMonth() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); }
 
-  function blank() { return { version: 1, employer: { name: '', address: '', tin: '', penCode: '', period: thisMonth(), payDate: '', pensionEe: 8, pensionEr: 10, nhfRate: 2.5, nhisRate: 5 }, staff: [], licence: '' }; }
+  function blank() { return { version: 1, employer: { name: '', address: '', tin: '', penCode: '', period: thisMonth(), payDate: '', pensionEe: 8, pensionEr: 10, nhfRate: 2.5, nhisRate: 5, mode: 'ng', currency: '₦', allowance: 0, bands: '' }, staff: [], licence: '' }; }
   var db;
   function load() { try { db = JSON.parse(localStorage.getItem(KEY)) || blank(); } catch (e) { db = blank(); } db = sanitize(db); }
   function save() { localStorage.setItem(KEY, JSON.stringify(db)); }
@@ -23,7 +24,18 @@
   }
   function isPro() { return L.isValid(db.licence); }
   function active() { return isPro() ? db.staff : db.staff.slice(0, FREE_LIMIT); }
-  function cfg() { var e = db.employer; return { pensionEe: e.pensionEe, pensionEr: e.pensionEr, nhfRate: e.nhfRate, nhisRate: e.nhisRate }; }
+  function parseBands(txt) { // lines: "width, rate%"; blank/"rest" width = remaining income
+    var out = String(txt || '').split(/\n/).map(function (l) { return l.trim(); }).filter(Boolean).map(function (l) {
+      var p = l.split(/[,;\t]/); var w = parseFloat(String(p[0]).replace(/[^0-9.]/g, '')); var r = parseFloat(String(p[1]).replace('%', ''));
+      return [isFinite(w) && w > 0 ? w : Infinity, (isFinite(r) ? r : 0) / 100];
+    });
+    var i = out.findIndex(function (b) { return b[0] === Infinity; });
+    if (i >= 0) out = out.slice(0, i + 1); else out.push([Infinity, out.length ? out[out.length - 1][1] : 0]);
+    return out;
+  }
+  function cfg() { var e = db.employer; CUR = e.mode === 'generic' ? ((e.currency || '').trim() ? e.currency.trim() + ' ' : '') : '₦';
+    var c = { pensionEe: e.pensionEe, pensionEr: e.pensionEr, nhfRate: e.nhfRate, nhisRate: e.nhisRate };
+    if (e.mode === 'generic') { c.mode = 'generic'; c.bands = parseBands(e.bands); c.allowance = e.allowance; } return c; }
   function periodText() { var p = db.employer.period || thisMonth(); var d = new Date(p + '-01T00:00:00'); return isNaN(d) ? p : d.toLocaleDateString('en-NG', { month: 'long', year: 'numeric' }); }
   function dueText() { var p = (db.employer.period || thisMonth()).split('-'); var d = new Date(+p[0], +p[1], 10); return d.toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric' }); }
 
@@ -37,10 +49,11 @@
 
   // ---------- employer
   var ef = $('#employerForm');
-  function fillEmployer() { Object.keys(db.employer).forEach(function (k) { if (ef.elements[k]) ef.elements[k].value = db.employer[k]; }); }
+  function fillEmployer() { cfg(); Object.keys(db.employer).forEach(function (k) { if (ef.elements[k]) ef.elements[k].value = db.employer[k]; }); }
   ef.addEventListener('submit', function (ev) {
     ev.preventDefault();
-    ['name', 'address', 'tin', 'penCode', 'period', 'payDate'].forEach(function (k) { db.employer[k] = ef.elements[k].value.trim(); });
+    ['name', 'address', 'tin', 'penCode', 'period', 'payDate', 'mode', 'currency', 'bands'].forEach(function (k) { db.employer[k] = ef.elements[k].value.trim(); });
+    db.employer.allowance = Math.max(0, parseFloat(ef.elements.allowance.value) || 0);
     ['pensionEe', 'pensionEr', 'nhfRate', 'nhisRate'].forEach(function (k) { var v = parseFloat(ef.elements[k].value); db.employer[k] = isFinite(v) && v >= 0 ? v : T.DEFAULTS[k]; });
     save(); $('#empSaved').textContent = 'Saved ✓'; setTimeout(function () { $('#empSaved').textContent = ''; }, 2000); render();
   });
@@ -173,5 +186,5 @@
   $('#buyLink').addEventListener('click', function (ev) { if (this.dataset.placeholder === 'true') { ev.preventDefault(); alert('Pro purchase is opening soon. Thank you for your interest!'); } });
 
   if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(function () {});
-  load(); fillEmployer(); render();
+  load(); cfg(); fillEmployer(); render();
 })();
